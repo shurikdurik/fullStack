@@ -11,6 +11,11 @@
       crossorigin="anonymous"
     />
     <title>REST API</title>
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <script type="importmap">
@@ -20,7 +25,7 @@
         }
       }
     </script>
-    <div class="container pt-3" id="app">
+    <div class="container pt-3" id="app" v-cloak>
       <h1>REST API</h1>
 
       <form class="form-inline mb-3" @submit.prevent="createContact">
@@ -46,27 +51,42 @@
           />
         </div>
 
-        <button class="btn btn-primary" type="submit">
+        <button class="btn btn-primary" type="submit" :disabled="!canCreate">
           Создать
         </button>
       </form>
 
-      <div class="card mb-3">
-        <div class="card-body">
-          <h5 class="card-title">
-            name
-          </h5>
+      <div v-if="loading">
+        <loader />
+      </div>
+      <div v-else-if="contacts.length">
+        <div class="card mb-3" v-for="contact in contacts">
+          <div class="card-body">
+            <h5
+              class="card-title"
+              :style="{color: contact.marked ? 'red' : 'black'}"
+            >
+              {{contact.name}}
+            </h5>
 
-          <p class="card-text">value</p>
+            <p class="card-text">{{contact.value}}</p>
 
-          <button class="btn btn-primary">
-            Отметить
-          </button>
+            <button
+              class="btn btn-primary"
+              @click="markContact(contact.id)"
+              :disabled="contact.marked"
+            >
+              Отметить
+            </button>
 
-          <button class="btn btn-danger">
-            Удалить
-          </button>
+            <button class="btn btn-danger" @click="removeContact(contact.id)">
+              Удалить
+            </button>
+          </div>
         </div>
+      </div>
+      <div v-else>
+        <p>No contacts</p>
       </div>
     </div>
     <script type="module" src="frontend.js"></script>
