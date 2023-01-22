@@ -19,14 +19,20 @@ const app = createApp({
     methods: {
         async createContact() {
             const {...contact} = this.form;
-            const response = await request('/api/contacts', 'POST', contact)
-            console.log(response);
+            const newContact = await request('/api/contacts', 'POST', contact);
+            this.contacts.push(newContact);
+            this.form.name = this.form.value = '';
         },
-        markContact(id) {
+        async markContact(id) {
             const contact = this.contacts.find(el => el.id === id);
-            contact.marked = true;
+            const updated = await request(`/api/contacts/${id}`, 'PUT', {
+                ...contact,
+                marked: true
+            })
+            contact.marked = updated.marked
         },
-        removeContact(id) {
+        async removeContact(id) {
+            request(`/api/contacts/${id}`, "DELETE")
             this.contacts = this.contacts.filter(c => c.id !== id)
         }
     },
